@@ -4,3 +4,75 @@
  */
 
 @import 'tailwindcss';
+.marquee-track {
+  display: flex;
+  animation: marquee 22s linear infinite;
+}
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/* Yatay scroll-barı gizle */
+.marquee-scrollbar::-webkit-scrollbar {
+  display: none !important;
+}
+.marquee-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  display: none !important;
+}
+
+/* src/index.css dosyanızın sonuna ekleyin */
+
+/* Önce Firefox için daha basit olan standart kuralları tanımlayalım */
+html {
+  scrollbar-width: thin; /* Scrollbar'ı inceltir ('auto' veya 'thin' olabilir) */
+  scrollbar-color: #98ad6a #f7f7f7; /* 1. renk: thumb (sürüklenen kısım), 2. renk: track (arka plan) */
+}
+
+/* Şimdi de Chrome, Safari, Edge ve diğer WebKit tabanlı tarayıcılar için
+    daha detaylı stilendirme yapalım. */
+
+/* 1. Scrollbar'ın tamamı */
+::-webkit-scrollbar {
+  width: 12px; /* Dikey scrollbar genişliği */
+  height: 12px; /* Yatay scrollbar yüksekliği (gerekirse) */
+}
+
+/* 2. Scrollbar'ın üzerinde hareket ettiği yol (track) */
+::-webkit-scrollbar-track {
+  background: #f7f7f7; /* Track'in arka plan rengi */
+  border-radius: 10px; /* Track'in köşelerini yuvarlatma */
+}
+
+/* 3. Sürüklenen ve kaydırmayı sağlayan kısım (thumb) */
+::-webkit-scrollbar-thumb {
+  background-color: #98ad6a; /* Thumb'ın rengi (Features bölümündeki bir renk tonu) */
+  border-radius: 10px; /* Thumb'ın köşelerini yuvarlatma */
+
+  /* Thumb ile track arasında boşluk varmış gibi bir efekt için border kullanıyoruz */
+}
+
+/* 4. Thumb'ın üzerine fare ile gelindiğinde (hover) */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #436d33; /* Hover durumunda daha koyu bir yeşil (Footer'daki bir renk) */
+}
+
+.font-oswald-header {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700; /* Kalın (Bold) ağırlık için. Linke "700" yazdığımız için kullanabiliyoruz. */
+}
+
+section#features {
+  transform: translateZ(0);
+  will-change: auto;
+}

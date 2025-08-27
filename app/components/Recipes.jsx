@@ -8,37 +8,43 @@ const recipesData = [
     id: 1,
     title: 'Tarhanalı Mantar Çorbası',
     thumbnailSrc: '/images/recipes/thumbnailcorba.jpeg',
-    videoSrc: '/videos/recipes/corba.mp4',
+    videoSrc:
+      'https://cdn.shopify.com/videos/c/o/v/5c5b03a523514fa19b56d8e437ad8232.mp4',
   },
   {
     id: 2,
     title: 'Sebzeli Pizza',
     thumbnailSrc: '/images/recipes/thumbnailpizza.jpeg',
-    videoSrc: '/videos/recipes/sebzelipizza.mp4',
+    videoSrc:
+      'https://cdn.shopify.com/videos/c/o/v/1617d4e99b934ce6b55400a2da9026bc.mp4',
   },
   {
     id: 3,
     title: 'Falafel',
     thumbnailSrc: '/images/recipes/thumbnailfalafel.jpeg',
-    videoSrc: '/videos/recipes/falafel.mp4',
+    videoSrc:
+      'https://cdn.shopify.com/videos/c/o/v/ce0f412e04444fe3bb62e1d227891c6e.mp4',
   },
   {
     id: 4,
     title: 'Şeftalili Soğuk Çay',
     thumbnailSrc: '/images/recipes/thumbnailseftalisogukcay.jpeg',
-    videoSrc: '/videos/recipes/seftalisogukcay.mp4',
+    videoSrc:
+      'https://cdn.shopify.com/videos/c/o/v/64bd00fda5c649c4a6dcde2a89e8ef4f.mp4',
   },
   {
     id: 5,
     title: 'Kahveli Cheesecake',
     thumbnailSrc: '/images/recipes/thumbnailkahvelicheesecake.jpeg',
-    videoSrc: '/videos/recipes/kahvelicheesecake.mp4',
+    videoSrc:
+      'https://cdn.shopify.com/videos/c/o/v/c410e13a3894495ab7fb5edd23eff1fd.mp4',
   },
   {
     id: 6,
     title: 'Mango-Kavun Dondurma',
     thumbnailSrc: '/images/recipes/thumbnailmangokavundondurma.jpeg',
-    videoSrc: '/videos/recipes/mangokavundondurma.mp4',
+    videoSrc:
+      'https://cdn.shopify.com/videos/c/o/v/27b1ae2c1ed94d58b6af36f117c9a1c0.mp4',
   },
 ];
 

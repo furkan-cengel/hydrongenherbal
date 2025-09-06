@@ -113,3 +113,16 @@ html {
     sans-serif;
   font-weight: 700;
 }
+
+/* Swiper icon fontunu kullanılamaz hale getir (CSP için) */
+@font-face {
+  font-family: 'swiper-icons';
+  src: local('no-such-font'); /* data: yerine yerel olmayan bir şey */
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  display: none !important;
+}

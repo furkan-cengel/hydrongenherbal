@@ -112,9 +112,8 @@ const Categories = forwardRef(function Categories(_, forwardedRef) {
   return (
     <section
       ref={forwardedRef ?? localRef}
-      className="relative bg-[#f7fbd1] min-h-screen"
+      className="relative bg-[#f7fbd1]"
       id="categories"
-      style={{zIndex: 10}}
     >
       <div className="panels-container w-full flex flex-col lg:flex-row">
         {featuredProductsData.map((product, index) => {

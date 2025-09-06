@@ -682,7 +682,8 @@ export default function RecipesRoute() {
         Modunu Yükselten Tarifler
       </h2>
 
-      <div className="mx-auto max-w-7xl mt-16 ">
+      {/* Vite ile birebir: mt kaldırıldı */}
+      <div className="mx-auto max-w-7xl">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 md:gap-10">
           {featuredRecipes.map((recipe) => (
             <button
@@ -693,15 +694,18 @@ export default function RecipesRoute() {
               onClick={() => setActiveRecipe(recipe)}
               aria-label={`${recipe.title} detaylarını aç`}
             >
-              <div className="w-full aspect-[1-4/3] ">
+              {/* --- GÖRSEL alanı: sabit h-[..] kaldırıldı, aspect ratio eklendi --- */}
+              <div className="overflow-hidden  rounded-t-xl">
                 <img
                   loading="lazy"
                   src={recipe.image}
                   alt={recipe.title}
-                  className="w-full  h-full object-cover"
+                  className="block w-full h-[360px] object-cover"
+                  decoding="async"
                 />
               </div>
 
+              {/* --- METİN --- */}
               <div className="p-4 sm:p-5">
                 <div className="flex flex-wrap items-center gap-2 mb-3">
                   <span className="bg-[#FFBD39] text-white text-[10px] sm:text-xs px-2 py-1 rounded-full">
@@ -776,7 +780,7 @@ function RecipeModal({recipe, onClose}) {
       aria-modal="true"
       aria-labelledby={headingId}
     >
-      {/* Tüm arka planı kaplayan KAPAT butonu (non-interactive div yerine button) */}
+      {/* Arka plan kapatıcı */}
       <button
         type="button"
         aria-label="Modalı kapat"
@@ -806,7 +810,10 @@ function RecipeModal({recipe, onClose}) {
             ref={closeBtnRef}
             type="button"
             onClick={handleClose}
-            className="text-2xl sm:text-3xl font-bold text-[#3E1E12] hover:text-[#FFBD39] transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3E1E12]"
+            className="text-2xl sm:text-3xl font-bold text-[#3E1E12]
+             hover:text-[#FFBD39] transition-colors
+             focus:outline-none
+             focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#3E1E12]"
             aria-label="Kapat"
           >
             &times;

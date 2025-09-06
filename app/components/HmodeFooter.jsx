@@ -70,12 +70,12 @@ export default function HmodeFooter() {
         {/* HMODE + Mascot */}
         <div className="flex-grow flex items-center justify-center w-full">
           <div className="w-full flex justify-center items-end relative">
-            <span className="select-none font-extrabold font-oswald-header text-[26vw] sm:text-[26vw] md:text-[26vw] h-auto text-[#3E7D5E] tracking-[0.012em] sm:tracking-normal  sm:leading-[0.6] uppercase relative z-10 mt-1 mb-1 sm:mt-15 sm:mb-8 md:mt-30 md:mb-20">
+            <span className="select-none  font-oswald font-bold  text-[28.5vw] sm:text-[31vw] md:text-[33vw] h-auto text-[#3E7D5E] tracking-[0.012em] sm:tracking-normal leading-[0.9] sm:leading-[0.8] uppercase relative z-10 mt-1 mb-1 sm:mt-15 sm:mb-8 md:mt-30 md:mb-20">
               <span className="relative inline-block">
                 H
                 <span
                   ref={mascotWrapperRef}
-                  className="absolute top-[28px] right-[-0.1px] sm:top-[-10px] md:top-[-30px] sm:right-[-2.4px] w-10 h-14 sm:w-18 sm:h-22 md:w-20 md:h-28 md:right-[-1px] lg:right-[3px] lg:w-38 lg:h-40 overflow-hidden"
+                  className="absolute top-[-7px] right-[-1.20px] sm:top-[-20px] md:top-[-15x] sm:right-[-2.4px] w-13 h-14 sm:w-22 sm:h-26 md:w-26 md:h-30 md:right-[1px] lg:right-[3px] lg:w-40 lg:h-40 overflow-hidden"
                   style={{
                     transform: 'translateX(25%) translateY(50%)',
                     zIndex: -1,
@@ -84,7 +84,7 @@ export default function HmodeFooter() {
                 >
                   <img
                     ref={mascotImgRef}
-                    src="/images/footer.gif"
+                    src="https://cdn.shopify.com/s/files/1/0761/4765/4889/files/footer.gif?v=1756626175"
                     alt="Herbalmode Maskot"
                     className="w-full h-full object-contain select-none"
                     style={{willChange: 'transform'}}

@@ -5,9 +5,6 @@ import {products} from '~/data/productsData';
 import CategoryButton from '~/components/CategoryButton';
 import MarqueeText from '~/components/MarqueeText';
 
-/**
- * @type {import('react-router').MetaFunction}
- */
 export const meta = () => [
   {title: 'HerbalMode — Ürünler'},
   {
@@ -54,20 +51,20 @@ export default function ProductsRoute() {
   );
   const [showCount, setShowCount] = useState(getPerPage());
   const productsSectionRef = useRef(null);
+  const firstRenderRef = useRef(true);
 
-  // URL değişince state'e yansıt
+  // URL'den kategori takip
   useEffect(() => {
     const newCategory = categoryFromUrl || 'Tüm Ürünler';
     if (newCategory !== activeCategory) setActiveCategory(newCategory);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [categoryFromUrl]);
+  }, [categoryFromUrl, activeCategory]);
 
-  // Kategori değişince perPage reset
+  // Kategori değişince sayfa başına ürün sayısını resetle
   useEffect(() => {
     setShowCount(getPerPage());
   }, [activeCategory]);
 
-  // Resize -> throttle + gereksiz setState atla
+  // Resize optimize
   useEffect(() => {
     let raf = 0;
     const onResize = () => {
@@ -87,34 +84,49 @@ export default function ProductsRoute() {
     };
   }, []);
 
-  // Kategori değişince kaydırma davranışı
+  // Kategori değişince scroll davranışı
   useEffect(() => {
+    // İlk render'da dokunma
+    if (firstRenderRef.current) {
+      firstRenderRef.current = false;
+      return;
+    }
+
     if (activeCategory === 'Tüm Ürünler') {
+      // Hero'ya
       if (typeof window !== 'undefined') {
         window.scrollTo({top: 0, behavior: 'auto'});
       }
-      return;
+    } else {
+      // Ürün gridine
+      productsSectionRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
     }
-    productsSectionRef.current?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    });
   }, [activeCategory]);
 
+  // Kategori seçim handler
   const handleCategorySelect = useCallback(
     (cat) => {
       setActiveCategory(cat);
       if (cat === 'Tüm Ürünler') {
-        navigate('/products', {replace: false});
+        // Parametreyi sil → hero'dan başla (scroll reset serbest)
+        navigate('/products', {replace: false, preventScrollReset: false});
       } else {
-        const sp = new URLSearchParams(location.search);
+        // Querystring ekle → üstte zıplamayı engelle
+        const sp = new URLSearchParams();
         sp.set('category', cat);
-        navigate(`/products?${sp.toString()}`, {replace: false});
+        navigate(`/products?${sp.toString()}`, {
+          replace: false,
+          preventScrollReset: true,
+        });
       }
     },
-    [location.search, navigate],
+    [navigate],
   );
 
+  // Liste verileri
   const filteredProducts = useMemo(
     () =>
       activeCategory === 'Tüm Ürünler'
@@ -132,24 +144,18 @@ export default function ProductsRoute() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      {/* Collections Hero */}
+      {/* Hero Section */}
       <section
-        className="
-          w-full min-h-[90svh] md:h-screen
-          flex items-center md:items-center lg:items-start justify-center
-          pt-16 md:pt-20 lg:pt-24 pb-24
-          bg-gradient-to-r from-[#cacbda] to-[#e1e3ff] relative
-        "
+        className="w-full h-[60vh] md:h-[80vh] flex items-center justify-center 
+                   bg-gradient-to-r from-[#cacbda] to-[#e1e3ff] relative overflow-hidden"
       >
-        <img
-          src="/images/products/collectionhero.webp"
-          alt="All Products"
-          className="absolute inset-0 w-full h-full object-cover object-center opacity-85"
-          decoding="async"
+        <div
+          className="absolute inset-0 bg-contain"
+          style={{backgroundImage: "url('/images/road.png')"}}
         />
 
-        <div className="relative z-10 text-center ">
-          <h1 className="text-5xl md:text-6xl items-start font-bold text-[#fff] drop-shadow-xl">
+        <div className="relative z-10 text-center -translate-y-24 md:-translate-y-32">
+          <h1 className="text-4xl md:text-6xl font-bold text-[#3E7D5E] drop-shadow-xl">
             Sağlıklı Yaşam <br /> Yolculuğuna Başla
           </h1>
         </div>
@@ -157,15 +163,12 @@ export default function ProductsRoute() {
         <img
           src="/images/shopping.gif"
           alt="Dekoratif element"
-          className="
-            absolute right-2  sm:right-6 md:right-8
-            bottom-12 sm:bottom-28 md:bottom-10
-            w-36 sm:w-48 md:w-72 h-auto z-20
-          "
-          decoding="async"
+          className="absolute right-2 sm:right-6 md:right-8 bottom-12 sm:bottom-28 md:bottom-10
+                     w-36 sm:w-48 md:w-72 h-auto z-20"
+          loading="lazy"
         />
 
-        {/* Alt Marquee */}
+        {/* Marquee */}
         <MarqueeText
           items={MARQUEE_ITEMS}
           repeatCount={4}
@@ -176,16 +179,22 @@ export default function ProductsRoute() {
         />
 
         <style>{`
-          .animate-marquee-custom { display: inline-flex; min-width: 100%; animation: marquee-custom 22s linear infinite; }
-          @keyframes marquee-custom { 0% { transform: translateX(0%);} 100% { transform: translateX(-50%);} }
-
+          .animate-marquee-custom { 
+            display: inline-flex; 
+            min-width: 100%; 
+            animation: marquee-custom 22s linear infinite; 
+          }
+          @keyframes marquee-custom { 
+            0% { transform: translateX(0%);} 
+            100% { transform: translateX(-50%);} 
+          }
           .no-scrollbar::-webkit-scrollbar { display: none; }
           .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         `}</style>
       </section>
 
       {/* Products Grid */}
-      <div ref={productsSectionRef} className="w-full py-12 px-4">
+      <div ref={productsSectionRef} className="w-full py-12 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="mb-8 sm:mb-10">
             <h2 className="text-2xl md:text-3xl font-bold text-[#436d33]/80 mb-2">
@@ -200,7 +209,7 @@ export default function ProductsRoute() {
           </div>
 
           <div className="w-full flex flex-col md:flex-row gap-8 md:gap-12 md:items-start">
-            {/* Sidebar (md+) */}
+            {/* Sidebar Desktop */}
             <aside className="hidden md:block md:w-1/5 lg:w-1/6">
               <div className="sticky top-24 flex flex-col gap-3">
                 {categories.map((cat) => (
@@ -215,7 +224,7 @@ export default function ProductsRoute() {
               </div>
             </aside>
 
-            {/* Mobile Filtre Chips (md-) */}
+            {/* Mobile Filter Chips */}
             <div className="md:hidden -mx-4 px-4 mb-6">
               <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
                 {categories.map((cat) => (
@@ -263,37 +272,54 @@ export default function ProductsRoute() {
 }
 
 const ProductCard = function ProductCard({product}) {
+  const [imageLoaded, setImageLoaded] = useState(false);
   const [hovered, setHovered] = useState(false);
 
   return (
     <Link to={`/product/${product.id}`} className="block h-full">
       <div
-        className="h-full bg-white rounded-2xl shadow-sm border border-[#ebeaf8] flex flex-col overflow-hidden transition-transform duration-200 hover:-translate-y-0.5"
+        className="h-full bg-white rounded-2xl shadow-sm border border-[#ebeaf8] 
+                   flex flex-col overflow-hidden transition-all duration-200 
+                   hover:shadow-lg hover:-translate-y-1"
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        <div className="w-full bg-[#E4F2EA]">
+        <div className="w-full bg-[#E4F2EA] relative">
           <div className="aspect-[4/5] sm:aspect-[3/4]">
+            {/* Placeholder */}
+            {!imageLoaded && (
+              <div className="absolute inset-0 bg-gradient-to-br from-[#E4F2EA] to-[#d1e8d8] animate-pulse" />
+            )}
+
+            {/* Main image */}
             <img
-              src={hovered && product.hoverImg ? product.hoverImg : product.img}
+              src={product.img}
               alt={product.name}
-              className="w-full h-full object-cover"
-              draggable="false"
+              className={`w-full h-full object-cover transition-opacity duration-300
+                         ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+              onLoad={() => setImageLoaded(true)}
               loading="lazy"
               decoding="async"
             />
+
+            {/* Hover image */}
+            {hovered && product.hoverImg && (
+              <img
+                src={product.hoverImg}
+                alt={product.name}
+                className="absolute inset-0 w-full h-full object-cover"
+                loading="eager"
+              />
+            )}
           </div>
         </div>
 
         <div className="p-3 sm:p-4 flex-1 flex flex-col">
           {product.badge && (
             <span
-              className="
-                inline-flex w-auto whitespace-nowrap max-w-[80%]
-                text-[#3E7D5E] text-[10px] sm:text-xs
-                font-semibold px-2.5 py-1 rounded-full mb-2 truncate
-              "
-              title={product.badge}
+              className="inline-flex w-fit   whitespace-nowrap 
+                           bg-[#E4F2EA] text-[#3E7D5E] text-[10px] sm:text-xs
+                           font-semibold px-2.5 py-1 rounded-full mb-2 truncate"
             >
               {product.badge}
             </span>
@@ -302,8 +328,6 @@ const ProductCard = function ProductCard({product}) {
           <h3 className="text-[#3E7D5E] font-bold text-sm sm:text-base leading-snug line-clamp-2">
             {product.name}
           </h3>
-
-          <div className="mt-auto" />
         </div>
       </div>
     </Link>

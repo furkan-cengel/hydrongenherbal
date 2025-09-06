@@ -83,7 +83,7 @@ export default function HmodeHeader() {
     <>
       <header
         className={`fixed top-0 left-0 w-full z-50 py-4 px-4 sm:px-6 lg:px-8 transition-all duration-300 ${
-          isScrolled ? 'bg-transparent' : ''
+          isScrolled && 'bg-transparent'
         }`}
       >
         <div className="w-full flex items-center justify-between">

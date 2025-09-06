@@ -2,9 +2,21 @@ import {useState, useEffect, useRef} from 'react';
 
 const words = ['Değiştir', 'Yenile', 'Canlandır', 'Geliştir'];
 const cardsData = [
-  {id: 1, src: '/images/chocolate.webp', zIndex: 'z-30'},
-  {id: 2, src: '/images/ahududu.webp', zIndex: 'z-20'},
-  {id: 3, src: '/images/seftali.webp', zIndex: 'z-10'},
+  {
+    id: 1,
+    src: 'https://cdn.shopify.com/s/files/1/0761/4765/4889/files/chocolate.webp?v=1756624245',
+    zIndex: 'z-30',
+  },
+  {
+    id: 2,
+    src: 'https://cdn.shopify.com/s/files/1/0761/4765/4889/files/ahududu.webp?v=1756624246',
+    zIndex: 'z-20',
+  },
+  {
+    id: 3,
+    src: 'https://cdn.shopify.com/s/files/1/0761/4765/4889/files/seftali.webp?v=1756624246',
+    zIndex: 'z-10',
+  },
 ];
 
 const AnimatedWord = ({currentWordIndex}) => {
@@ -97,7 +109,7 @@ export default function Hero() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentWordIndex((prev) => (prev + 1) % words.length); // ✅ düzeltildi
+      setCurrentWordIndex((prev) => (prev + 1) % words.length);
     }, 2500);
     return () => clearInterval(interval);
   }, []);
@@ -174,6 +186,18 @@ export default function Hero() {
   return (
     <>
       <style>{`
+        /* Safe area padding helpers */
+        .safe-area-top {
+          padding-top: env(safe-area-inset-top);
+        }
+        
+        /* Prevent overlays on mobile */
+        @supports (padding-top: env(safe-area-inset-top)) {
+          .hero-container {
+            padding-top: max(env(safe-area-inset-top), 20px);
+          }
+        }
+        
         .word-transition-wrapper { opacity: 0; transition: opacity 0.4s ease-in-out; }
         .word-transition-wrapper.is-visible { opacity: 1; }
         .word-swapper { position: relative; height: 110px;
@@ -217,13 +241,26 @@ export default function Hero() {
       >
         <img
           ref={gifRef}
-          src="/images/hero.gif"
+          src="https://cdn.shopify.com/s/files/1/0761/4765/4889/files/hero.gif?v=1756624575"
           alt="Animated element"
           className="w-32 sm:w-48 lg:w-72 h-auto absolute bottom-0 left-0 transform translate-y-full z-0"
         />
 
         <div className="w-full h-full flex flex-col lg:flex-row p-4">
-          <div className="w-full lg:w-2/5 flex flex-col justify-center items-center lg:items-start text-center lg:text-left px-4 sm:px-8 lg:px-12 xl:px-20 gap-4 order-2 lg:order-1">
+          {/* SOL: metin */}
+          <div
+            className="
+            w-full lg:w-2/5 
+            flex flex-col justify-center items-center lg:items-start 
+            text-center lg:text-left 
+            px-4 sm:px-8 lg:px-12 xl:px-20 
+            gap-4 
+            order-2 lg:order-1 
+            z-10
+            /* Mobilde metin için ekstra üst boşluk */
+            mt-8 sm:mt-10 lg:mt-0
+          "
+          >
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-800 mb-2 leading-tight min-h-[120px] sm:min-h-[150px]">
               <AnimatedWord
                 key={currentWordIndex}
@@ -231,8 +268,8 @@ export default function Hero() {
               />
             </h1>
             <p className="text-lg sm:text-xl lg:text-2xl text-gray-600 mb-6 sm:mb-8 leading-relaxed max-w-lg">
-              Sen de Herbalife’ın doğal içerikli ürünleriyle hayatına denge,
-              enerji ve canlılık kat!
+              Sen de Herbalife&apos;ın doğal içerikli ürünleriyle hayatına
+              denge, enerji ve canlılık kat!
             </p>
             <button
               className="bg-[#3e7d5e] text-white font-semibold py-3 px-8 rounded-md text-base sm:text-lg shadow-lg w-fit hover:bg-green-700 transition-colors"
@@ -242,8 +279,39 @@ export default function Hero() {
             </button>
           </div>
 
-          <div className="w-full lg:w-3/5 h-full relative flex items-center justify-center order-1 lg:order-2 mb-12 lg:mb-0">
-            <div className="relative w-64 h-80 sm:w-80 sm:h-96 lg:w-[32rem] lg:h-[34rem] xl:w-[40rem] xl:h-[38rem]">
+          {/* SAĞ: görsel fan - Mobilde daha aşağıda başlasın */}
+          <div
+            className="
+              w-full lg:w-3/5 
+              relative flex items-center justify-center 
+              order-1 lg:order-2
+              z-[1]
+              /* Mobil ve tablet için özel konumlandırma */
+              h-[400px] sm:h-[450px] md:h-[500px] lg:h-full
+              /* Görselleri aşağı kaydır - overlay'i önle */
+              mt-4 sm:mt-6 md:mt-8 lg:mt-0
+              /* Ekstra safe padding mobil için */
+              pt-[calc(env(safe-area-inset-top)+1rem)] lg:pt-0
+            "
+          >
+            {/* Görsel container - boyutları ayarla */}
+            <div
+              className="
+              relative 
+              /* Mobilde daha küçük boyutlar */
+              w-56 h-72           /* mobile: 224px x 288px */
+              sm:w-72 sm:h-80     /* small: 288px x 320px */
+              md:w-80 md:h-96     /* tablet: 320px x 384px */
+              lg:w-[32rem] lg:h-[34rem]   /* desktop */
+              xl:w-[40rem] xl:h-[38rem]   /* xl desktop */
+              /* Konumlandırma düzeltmesi */
+              transform 
+              translate-y-0       /* Varsayılan olarak kaydırma yok */
+              sm:translate-y-4    /* Small ekranlarda hafif aşağı */
+              md:translate-y-6    /* Tablet'te biraz daha aşağı */
+              lg:translate-y-0    /* Desktop'ta sıfırla */
+            "
+            >
               {cardsData.map((card) => (
                 <div
                   key={card.id}
@@ -253,6 +321,7 @@ export default function Hero() {
                     src={card.src}
                     alt={`Ürün ${card.id}`}
                     className="w-full h-full object-contain drop-shadow-xl"
+                    loading="eager"
                   />
                 </div>
               ))}

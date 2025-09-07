@@ -9,9 +9,9 @@ import {
 } from '@shopify/hydrogen';
 
 // 🔧 IMPORT DÜZELTME: _shopify_base yolunu kullan
-import ProductPrice from '~/components/_shopify_base/ProductPrice';
-import ProductImage from '~/components/_shopify_base/ProductImage';
-import ProductForm from '~/components/_shopify_base/ProductForm';
+import {ProductPrice} from '~/components/_shopify_base/ProductPrice';
+import {ProductImage} from '~/components/_shopify_base/ProductImage';
+import {ProductForm} from '~/components/_shopify_base/ProductForm';
 
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 

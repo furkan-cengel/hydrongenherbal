@@ -5,7 +5,7 @@ import {getPaginationVariables, Analytics} from '@shopify/hydrogen';
 // NOT: Şimdilik _shopify_base altındaki sürümleri kullanıyoruz.
 import {PaginatedResourceSection} from '~/components/_shopify_base/PaginatedResourceSection';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
-import ProductItem from '~/components/_shopify_base/ProductItem';
+import {ProductItem} from '~/components/_shopify_base/ProductItem';
 
 /**
  * @type {import('react-router').MetaFunction<typeof loader>}

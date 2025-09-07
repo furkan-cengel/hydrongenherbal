@@ -1,6 +1,6 @@
 // app/components/HmodeHeader.jsx
 import {useEffect, useRef, useState} from 'react';
-import {Link} from 'react-router';
+import {Link, useRouteLoaderData} from 'react-router';
 import Logo from '~/components/Logo';
 
 const navLinks = [
@@ -12,6 +12,10 @@ const navLinks = [
 ];
 
 export default function HmodeHeader() {
+  /** @type {{ cart?: { totalQuantity?: number } }} */
+  const rootData = useRouteLoaderData('root');
+  const cartQty = rootData?.cart?.totalQuantity ?? 0;
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -97,7 +101,75 @@ export default function HmodeHeader() {
             <Logo />
           </div>
 
-          <div>
+          {/* Sağ üst aksiyonlar + menü butonu */}
+          <div className="flex items-center gap-3">
+            {/* Desktop quick actions */}
+            <div className="hidden sm:flex items-center gap-2 text-[#3E7D5E]">
+              <Link
+                to="/search"
+                aria-label="Ara"
+                className="p-2 rounded-md hover:bg-gray-200/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3E7D5E]/50 focus-visible:ring-offset-2"
+              >
+                {/* search icon */}
+                <svg
+                  className="w-6 h-6"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <circle cx="11" cy="11" r="7" strokeWidth="2"></circle>
+                  <line
+                    x1="21"
+                    y1="21"
+                    x2="16.65"
+                    y2="16.65"
+                    strokeWidth="2"
+                  ></line>
+                </svg>
+              </Link>
+
+              <Link
+                to="/account"
+                aria-label="Hesabım"
+                className="p-2 rounded-md hover:bg-gray-200/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3E7D5E]/50 focus-visible:ring-offset-2"
+              >
+                {/* user icon */}
+                <svg
+                  className="w-6 h-6"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <path d="M20 21a8 8 0 10-16 0" strokeWidth="2" />
+                  <circle cx="12" cy="7" r="4" strokeWidth="2" />
+                </svg>
+              </Link>
+
+              <Link
+                to="/cart"
+                aria-label="Sepet"
+                className="relative p-2 rounded-md hover:bg-gray-200/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3E7D5E]/50 focus-visible:ring-offset-2"
+              >
+                {/* cart icon */}
+                <svg
+                  className="w-6 h-6"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <path d="M3 3h2l.4 2M7 13h11l2-7H6.4" strokeWidth="2" />
+                  <circle cx="9" cy="20" r="1.5" />
+                  <circle cx="18" cy="20" r="1.5" />
+                </svg>
+                {cartQty > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-[#3E7D5E] text-white text-[10px] flex items-center justify-center">
+                    {cartQty}
+                  </span>
+                )}
+              </Link>
+            </div>
+
+            {/* Mobile: Menü butonu */}
             <button
               ref={menuButtonRef}
               onClick={() => setIsMenuOpen((v) => !v)}
@@ -150,6 +222,31 @@ export default function HmodeHeader() {
                 <span className="absolute left-1/2 -bottom-1 w-0 h-0.5 bg-[#c1a852] transition-all duration-300 group-hover:w-full group-hover:left-0" />
               </Link>
             ))}
+
+            {/* Mobile quick actions */}
+            <div className="flex items-center gap-6 pt-6">
+              <Link
+                to="/search"
+                onClick={(e) => handleLinkClick(e, '/search')}
+                className="text-xl font-semibold text-[#3E7D5E] hover:text-[#c1a852]"
+              >
+                Ara
+              </Link>
+              <Link
+                to="/account"
+                onClick={(e) => handleLinkClick(e, '/account')}
+                className="text-xl font-semibold text-[#3E7D5E] hover:text-[#c1a852]"
+              >
+                Hesabım
+              </Link>
+              <Link
+                to="/cart"
+                onClick={(e) => handleLinkClick(e, '/cart')}
+                className="relative text-xl font-semibold text-[#3E7D5E] hover:text-[#c1a852]"
+              >
+                Sepet{cartQty > 0 ? ` (${cartQty})` : ''}
+              </Link>
+            </div>
           </div>
         </div>
       )}

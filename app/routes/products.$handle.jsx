@@ -7,22 +7,25 @@ import {
   getAdjacentAndFirstAvailableVariants,
   useSelectedOptionInUrlParam,
 } from '@shopify/hydrogen';
-import {ProductPrice} from '~/components/ProductPrice';
-import {ProductImage} from '~/components/ProductImage';
-import {ProductForm} from '~/components/ProductForm';
+
+// 🔧 IMPORT DÜZELTME: _shopify_base yolunu kullan
+import ProductPrice from '~/components/_shopify_base/ProductPrice';
+import ProductImage from '~/components/_shopify_base/ProductImage';
+import ProductForm from '~/components/_shopify_base/ProductForm';
+
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
 /**
  * @type {MetaFunction<typeof loader>}
  */
 export const meta = ({data}) => {
-  return [
-    {title: `Hydrogen | ${data?.product.title ?? ''}`},
-    {
-      rel: 'canonical',
-      href: `/products/${data?.product.handle}`,
-    },
-  ];
+  const title = data?.product?.title
+    ? `HerbalMode | ${data.product.title}`
+    : 'HerbalMode | Ürün';
+  const canonical = data?.product?.handle
+    ? `/products/${data.product.handle}`
+    : '/products';
+  return [{title}, {rel: 'canonical', href: canonical}];
 };
 
 /**
@@ -65,9 +68,7 @@ async function loadCriticalData({context, params, request}) {
   // The API handle might be localized, so redirect to the localized handle
   redirectIfHandleIsLocalized(request, {handle, data: product});
 
-  return {
-    product,
-  };
+  return {product};
 }
 
 /**
@@ -76,10 +77,8 @@ async function loadCriticalData({context, params, request}) {
  * Make sure to not throw any errors here, as it will cause the page to 500.
  * @param {LoaderFunctionArgs}
  */
-function loadDeferredData({context, params}) {
-  // Put any API calls that is not critical to be available on first page render
-  // For example: product reviews, product recommendations, social feeds.
-
+function loadDeferredData() {
+  // Non-critical veriler (önerilenler, yorumlar vs.) için alan.
   return {};
 }
 
@@ -106,28 +105,41 @@ export default function Product() {
   const {title, descriptionHtml} = product;
 
   return (
-    <div className="product">
-      <ProductImage image={selectedVariant?.image} />
-      <div className="product-main">
-        <h1>{title}</h1>
-        <ProductPrice
-          price={selectedVariant?.price}
-          compareAtPrice={selectedVariant?.compareAtPrice}
-        />
-        <br />
-        <ProductForm
-          productOptions={productOptions}
-          selectedVariant={selectedVariant}
-        />
-        <br />
-        <br />
-        <p>
-          <strong>Description</strong>
-        </p>
-        <br />
-        <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />
-        <br />
+    <div className="mx-auto max-w-7xl px-4 py-10">
+      <div className="grid gap-10 md:grid-cols-2">
+        <div className="rounded-2xl overflow-hidden">
+          <ProductImage image={selectedVariant?.image} />
+        </div>
+
+        <div className="product-main">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#3E1E12]">
+            {title}
+          </h1>
+
+          <div className="mt-4">
+            <ProductPrice
+              price={selectedVariant?.price}
+              compareAtPrice={selectedVariant?.compareAtPrice}
+            />
+          </div>
+
+          <div className="mt-6">
+            <ProductForm
+              productOptions={productOptions}
+              selectedVariant={selectedVariant}
+            />
+          </div>
+
+          <div className="mt-10 prose max-w-none prose-p:leading-relaxed">
+            <p className="font-semibold text-[#3E1E12]">Açıklama</p>
+            <div
+              className="mt-3"
+              dangerouslySetInnerHTML={{__html: descriptionHtml}}
+            />
+          </div>
+        </div>
       </div>
+
       <Analytics.ProductView
         data={{
           products: [
@@ -211,7 +223,11 @@ const PRODUCT_FRAGMENT = `#graphql
         }
       }
     }
-    selectedOrFirstAvailableVariant(selectedOptions: $selectedOptions, ignoreUnknownOptions: true, caseInsensitiveMatch: true) {
+    selectedOrFirstAvailableVariant(
+      selectedOptions: $selectedOptions,
+      ignoreUnknownOptions: true,
+      caseInsensitiveMatch: true
+    ) {
       ...ProductVariant
     }
     adjacentVariants (selectedOptions: $selectedOptions) {

@@ -8,7 +8,7 @@ import {getEmptyPredictiveSearchResult} from '~/lib/search';
  * @type {MetaFunction}
  */
 export const meta = () => {
-  return [{title: `Hydrogen | Search`}];
+  return [{title: `HerbalMode | Search`}];
 };
 
 /**
@@ -32,43 +32,67 @@ export async function loader({request, context}) {
 /**
  * Renders the /search route
  */
+/**
+ * Renders the /search route
+ */
 export default function SearchPage() {
   /** @type {LoaderReturnData} */
   const {type, term, result, error} = useLoaderData();
   if (type === 'predictive') return null;
 
+  const hasTerm = Boolean(term && term.trim());
+  const total = result?.total ?? 0;
+
   return (
-    <div className="search">
-      <h1>Search</h1>
+    <div className="mx-auto max-w-7xl px-4 pt-24 pb-12">
+      <h1 className="text-2xl sm:text-3xl font-bold text-[#3E1E12] mb-6">
+        Arama
+      </h1>
+
       <SearchForm>
         {({inputRef}) => (
-          <>
+          <div className="flex gap-2">
             <input
-              defaultValue={term}
-              name="q"
-              placeholder="Search…"
               ref={inputRef}
               type="search"
+              defaultValue={term}
+              name="q"
+              placeholder="Ne aramıştınız?"
+              className="w-full rounded-xl border border-black/10 px-4 py-3 outline-none focus:ring-2 focus:ring-[#3E7D5E]/40"
             />
-            &nbsp;
-            <button type="submit">Search</button>
-          </>
+            <button
+              type="submit"
+              className="rounded-xl px-5 py-3 bg-[#3E7D5E] text-white font-semibold hover:bg-[#2f6048] transition"
+            >
+              Ara
+            </button>
+          </div>
         )}
       </SearchForm>
-      {error && <p style={{color: 'red'}}>{error}</p>}
-      {!term || !result?.total ? (
-        <SearchResults.Empty />
-      ) : (
-        <SearchResults result={result} term={term}>
-          {({articles, pages, products, term}) => (
-            <div>
-              <SearchResults.Products products={products} term={term} />
-              <SearchResults.Pages pages={pages} term={term} />
-              <SearchResults.Articles articles={articles} term={term} />
-            </div>
-          )}
-        </SearchResults>
-      )}
+
+      {error && <p className="mt-3 text-red-600">{error}</p>}
+
+      {/* İlk girişte "No results" gösterme; sadece arama yapıldıysa göster */}
+      {hasTerm ? (
+        total > 0 ? (
+          <div className="mt-8">
+            <SearchResults result={result} term={term}>
+              {({articles, pages, products, term}) => (
+                <div className="space-y-10">
+                  <SearchResults.Products products={products} term={term} />
+                  <SearchResults.Pages pages={pages} term={term} />
+                  <SearchResults.Articles articles={articles} term={term} />
+                </div>
+              )}
+            </SearchResults>
+          </div>
+        ) : (
+          <p className="mt-6 text-[#3E1E12]/70">
+            Sonuç bulunamadı, farklı bir arama deneyin.
+          </p>
+        )
+      ) : null}
+
       <Analytics.SearchView data={{searchTerm: term, searchResults: result}} />
     </div>
   );

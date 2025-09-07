@@ -1,47 +1,38 @@
+// app/routes/collections._index.jsx
 import {useLoaderData, Link} from 'react-router';
 import {getPaginationVariables, Image} from '@shopify/hydrogen';
-import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
+// NOT: Şimdilik _shopify_base altındaki sürümü kullanıyoruz.
+// Bunu components köküne taşırsan import'u ~/components/PaginatedResourceSection yaparsın.
+import {PaginatedResourceSection} from '~/components/_shopify_base/PaginatedResourceSection';
+
+/** @type {import('react-router').MetaFunction} */
+export const meta = () => [
+  {title: 'HerbalMode | Koleksiyonlar'},
+  {rel: 'canonical', href: '/collections'},
+];
 
 /**
  * @param {LoaderFunctionArgs} args
  */
 export async function loader(args) {
-  // Start fetching non-critical data without blocking time to first byte
   const deferredData = loadDeferredData(args);
-
-  // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
-
   return {...deferredData, ...criticalData};
 }
 
-/**
- * Load data necessary for rendering content above the fold. This is the critical data
- * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
- * @param {LoaderFunctionArgs}
- */
 async function loadCriticalData({context, request}) {
-  const paginationVariables = getPaginationVariables(request, {
-    pageBy: 4,
-  });
+  const paginationVariables = getPaginationVariables(request, {pageBy: 4});
 
   const [{collections}] = await Promise.all([
     context.storefront.query(COLLECTIONS_QUERY, {
       variables: paginationVariables,
     }),
-    // Add other queries here, so that they are loaded in parallel
   ]);
 
   return {collections};
 }
 
-/**
- * Load data for rendering content below the fold. This data is deferred and will be
- * fetched after the initial page load. If it's unavailable, the page should still 200.
- * Make sure to not throw any errors here, as it will cause the page to 500.
- * @param {LoaderFunctionArgs}
- */
-function loadDeferredData({context}) {
+function loadDeferredData() {
   return {};
 }
 
@@ -50,11 +41,14 @@ export default function Collections() {
   const {collections} = useLoaderData();
 
   return (
-    <div className="collections">
-      <h1>Collections</h1>
+    <div className="mx-auto max-w-7xl px-4 py-10">
+      <h1 className="text-2xl sm:text-3xl font-bold text-[#3E1E12] mb-6">
+        Koleksiyonlar
+      </h1>
+
       <PaginatedResourceSection
         connection={collections}
-        resourcesClassName="collections-grid"
+        resourcesClassName="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
       >
         {({node: collection, index}) => (
           <CollectionItem
@@ -77,7 +71,7 @@ export default function Collections() {
 function CollectionItem({collection, index}) {
   return (
     <Link
-      className="collection-item"
+      className="group block rounded-2xl overflow-hidden border border-black/5 hover:shadow-md transition"
       key={collection.id}
       to={`/collections/${collection.handle}`}
       prefetch="intent"
@@ -89,9 +83,12 @@ function CollectionItem({collection, index}) {
           data={collection.image}
           loading={index < 3 ? 'eager' : undefined}
           sizes="(min-width: 45em) 400px, 100vw"
+          className="w-full h-auto"
         />
       )}
-      <h5>{collection.title}</h5>
+      <h5 className="p-4 text-[#3E1E12] font-semibold group-hover:text-[#c1a852]">
+        {collection.title}
+      </h5>
     </Link>
   );
 }

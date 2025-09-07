@@ -1,7 +1,8 @@
 // app/routes/products._index.jsx
 import {useEffect, useRef, useState, useMemo, useCallback} from 'react';
-import {Link, useLocation, useNavigate} from 'react-router';
-import {products} from '~/data/productsData';
+import {Link, useLocation, useNavigate, useLoaderData} from 'react-router';
+
+// UI parçaları (senin mevcut komponentlerin)
 import CategoryButton from '~/components/CategoryButton';
 import MarqueeText from '~/components/MarqueeText';
 
@@ -14,6 +15,7 @@ export const meta = () => [
   },
 ];
 
+// Kategori başlıklarını sabit tutuyoruz:
 const categories = [
   'Tüm Ürünler',
   'Temel Beslenme',
@@ -24,6 +26,19 @@ const categories = [
   'Aktif Yaşam Ürünleri',
 ];
 
+// Bu eşlemede Shopify’da oluşturacağın **koleksiyon handle**’larını kullanıyoruz.
+// Lütfen Shopify’da aşağıdaki başlıklara karşılık gelen koleksiyonları oluştur:
+// (Örnek handle’lar: turkce karakter/boşluk içermesin)
+const CATEGORY_TO_COLLECTION_HANDLE = {
+  'Temel Beslenme': 'temel-beslenme',
+  İçecekler: 'icecekler',
+  Atıştırmalıklar: 'atistirmaliklar',
+  'Dış Beslenme': 'dis-beslenme',
+  'Takviye Edici Gıdalar': 'takviye-edici-gidalar',
+  'Aktif Yaşam Ürünleri': 'aktif-yasam-urunleri',
+};
+
+// Marquee metinleri
 const MARQUEE_ITEMS = [
   'BİLİMSEL DESTEKLİ TAKVİYELER',
   'HER GÜN İYİ YAŞAM ALIŞKANLIKLARI',
@@ -37,9 +52,74 @@ function getPerPage() {
   return 12;
 }
 
+/**
+ * LOADER
+ * - URL’de ?category= varsa ilgili koleksiyonun ürünlerini getirir
+ * - yoksa genel ürün akışından ürünleri getirir
+ * Not: Basitlik adına ilk 48 ürünü alıyoruz; “Daha Fazla Göster” client-side slice ile çalışıyor.
+ */
+export async function loader({request, context}) {
+  const url = new URL(request.url);
+  const category = url.searchParams.get('category');
+  const handle =
+    category && CATEGORY_TO_COLLECTION_HANDLE[category]
+      ? CATEGORY_TO_COLLECTION_HANDLE[category]
+      : null;
+
+  const {storefront} = context;
+
+  if (handle) {
+    const data = await storefront.query(COLLECTION_PRODUCTS_QUERY, {
+      variables: {handle, first: 48},
+    });
+
+    const nodes = data?.collection?.products?.nodes ?? [];
+    // UI’nin beklediği forma yakın hafif normalize
+    const items = nodes.map((p) => ({
+      id: p.id,
+      handle: p.handle,
+      name: p.title,
+      img: p.featuredImage?.url ?? '',
+      hoverImg: null, // ileride 2. görseli eklersek doldururuz
+      badge: p.vendor || '', // istersen vendor’ı rozet gibi gösterebilirsin
+      description: p.description || '',
+    }));
+
+    return {
+      source: 'collection',
+      category: category || 'Tüm Ürünler',
+      title: data?.collection?.title ?? category ?? 'Ürünler',
+      items,
+    };
+  }
+
+  // Tüm ürünler akışı
+  const data = await storefront.query(ALL_PRODUCTS_QUERY, {
+    variables: {first: 48},
+  });
+  const nodes = data?.products?.nodes ?? [];
+  const items = nodes.map((p) => ({
+    id: p.id,
+    handle: p.handle,
+    name: p.title,
+    img: p.featuredImage?.url ?? '',
+    hoverImg: null,
+    badge: p.vendor || '',
+    description: p.description || '',
+  }));
+
+  return {
+    source: 'all',
+    category: 'Tüm Ürünler',
+    title: 'Tüm Ürünler',
+    items,
+  };
+}
+
 export default function ProductsRoute() {
   const location = useLocation();
   const navigate = useNavigate();
+  const {items, category: loaderCategory, title} = useLoaderData();
 
   const categoryFromUrl = useMemo(() => {
     const sp = new URLSearchParams(location.search);
@@ -47,13 +127,13 @@ export default function ProductsRoute() {
   }, [location.search]);
 
   const [activeCategory, setActiveCategory] = useState(
-    categoryFromUrl || 'Tüm Ürünler',
+    categoryFromUrl || loaderCategory || 'Tüm Ürünler',
   );
   const [showCount, setShowCount] = useState(getPerPage());
   const productsSectionRef = useRef(null);
   const firstRenderRef = useRef(true);
 
-  // URL'den kategori takip
+  // URL değişince aktif kategori güncelle
   useEffect(() => {
     const newCategory = categoryFromUrl || 'Tüm Ürünler';
     if (newCategory !== activeCategory) setActiveCategory(newCategory);
@@ -86,19 +166,15 @@ export default function ProductsRoute() {
 
   // Kategori değişince scroll davranışı
   useEffect(() => {
-    // İlk render'da dokunma
     if (firstRenderRef.current) {
       firstRenderRef.current = false;
       return;
     }
-
     if (activeCategory === 'Tüm Ürünler') {
-      // Hero'ya
       if (typeof window !== 'undefined') {
         window.scrollTo({top: 0, behavior: 'auto'});
       }
     } else {
-      // Ürün gridine
       productsSectionRef.current?.scrollIntoView({
         behavior: 'smooth',
         block: 'start',
@@ -106,15 +182,13 @@ export default function ProductsRoute() {
     }
   }, [activeCategory]);
 
-  // Kategori seçim handler
+  // Kategori seçim handler (URL paramını değiştiriyoruz)
   const handleCategorySelect = useCallback(
     (cat) => {
       setActiveCategory(cat);
       if (cat === 'Tüm Ürünler') {
-        // Parametreyi sil → hero'dan başla (scroll reset serbest)
         navigate('/products', {replace: false, preventScrollReset: false});
       } else {
-        // Querystring ekle → üstte zıplamayı engelle
         const sp = new URLSearchParams();
         sp.set('category', cat);
         navigate(`/products?${sp.toString()}`, {
@@ -126,21 +200,12 @@ export default function ProductsRoute() {
     [navigate],
   );
 
-  // Liste verileri
-  const filteredProducts = useMemo(
-    () =>
-      activeCategory === 'Tüm Ürünler'
-        ? products
-        : products.filter((p) => p.category === activeCategory),
-    [activeCategory],
-  );
-
   const visibleProducts = useMemo(
-    () => filteredProducts.slice(0, showCount),
-    [filteredProducts, showCount],
+    () => (items || []).slice(0, showCount),
+    [items, showCount],
   );
 
-  const canLoadMore = showCount < filteredProducts.length;
+  const canLoadMore = (items || []).length > showCount;
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
@@ -198,9 +263,7 @@ export default function ProductsRoute() {
         <div className="max-w-7xl mx-auto">
           <div className="mb-8 sm:mb-10">
             <h2 className="text-2xl md:text-3xl font-bold text-[#436d33]/80 mb-2">
-              {activeCategory === 'Tüm Ürünler'
-                ? 'Tüm Ürünler'
-                : activeCategory}
+              {activeCategory === 'Tüm Ürünler' ? 'Tüm Ürünler' : title}
             </h2>
             <p className="text-base md:text-lg text-[#436d33] max-w-2xl">
               Tüm ürünlerimiz bilim destekli, modern ve fonksiyonel formüllerle
@@ -271,12 +334,12 @@ export default function ProductsRoute() {
   );
 }
 
-const ProductCard = function ProductCard({product}) {
+function ProductCard({product}) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [hovered, setHovered] = useState(false);
 
   return (
-    <Link to={`/product/${product.id}`} className="block h-full">
+    <Link to={`/products/${product.handle}`} className="block h-full">
       <div
         className="h-full bg-white rounded-2xl shadow-sm border border-[#ebeaf8] 
                    flex flex-col overflow-hidden transition-all duration-200 
@@ -286,23 +349,22 @@ const ProductCard = function ProductCard({product}) {
       >
         <div className="w-full bg-[#E4F2EA] relative">
           <div className="aspect-[4/5] sm:aspect-[3/4]">
-            {/* Placeholder */}
             {!imageLoaded && (
               <div className="absolute inset-0 bg-gradient-to-br from-[#E4F2EA] to-[#d1e8d8] animate-pulse" />
             )}
 
-            {/* Main image */}
             <img
               src={product.img}
               alt={product.name}
-              className={`w-full h-full object-cover transition-opacity duration-300
-                         ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+              className={`w-full h-full object-cover transition-opacity duration-300 ${
+                imageLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
               onLoad={() => setImageLoaded(true)}
               loading="lazy"
               decoding="async"
             />
 
-            {/* Hover image */}
+            {/* Hover resmi ileride eklenecek */}
             {hovered && product.hoverImg && (
               <img
                 src={product.hoverImg}
@@ -317,9 +379,9 @@ const ProductCard = function ProductCard({product}) {
         <div className="p-3 sm:p-4 flex-1 flex flex-col">
           {product.badge && (
             <span
-              className="inline-flex w-fit   whitespace-nowrap 
-                           bg-[#E4F2EA] text-[#3E7D5E] text-[10px] sm:text-xs
-                           font-semibold px-2.5 py-1 rounded-full mb-2 truncate"
+              className="inline-flex w-fit whitespace-nowrap 
+                         bg-[#E4F2EA] text-[#3E7D5E] text-[10px] sm:text-xs
+                         font-semibold px-2.5 py-1 rounded-full mb-2 truncate"
             >
               {product.badge}
             </span>
@@ -332,4 +394,61 @@ const ProductCard = function ProductCard({product}) {
       </div>
     </Link>
   );
-};
+}
+
+/** ================= GraphQL Queries ================= **/
+
+// Genel ürün akışı (ilk 48)
+const ALL_PRODUCTS_QUERY = `#graphql
+  query AllProducts($first: Int!, $country: CountryCode, $language: LanguageCode)
+    @inContext(country: $country, language: $language) {
+    products(first: $first, sortKey: CREATED_AT, reverse: true) {
+      nodes {
+        id
+        handle
+        title
+        description
+        vendor
+        featuredImage {
+          url
+          altText
+          width
+          height
+        }
+      }
+    }
+  }
+`;
+
+// Koleksiyon → ürünleri
+const COLLECTION_PRODUCTS_QUERY = `#graphql
+  query CollectionProducts(
+    $handle: String!
+    $first: Int!
+    $country: CountryCode
+    $language: LanguageCode
+  ) @inContext(country: $country, language: $language) {
+    collection(handle: $handle) {
+      id
+      title
+      handle
+      products(first: $first) {
+        nodes {
+          id
+          handle
+          title
+          description
+          vendor
+          featuredImage {
+            url
+            altText
+            width
+            height
+          }
+        }
+      }
+    }
+  }
+`;
+
+/** @typedef {import('@shopify/remix-oxygen').LoaderFunctionArgs} LoaderFunctionArgs */

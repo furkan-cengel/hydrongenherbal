@@ -26,9 +26,7 @@ const categories = [
   'Aktif Yaşam Ürünleri',
 ];
 
-// Bu eşlemede Shopify’da oluşturacağın **koleksiyon handle**’larını kullanıyoruz.
-// Lütfen Shopify’da aşağıdaki başlıklara karşılık gelen koleksiyonları oluştur:
-// (Örnek handle’lar: turkce karakter/boşluk içermesin)
+// Shopify koleksiyon handle eşlemesi
 const CATEGORY_TO_COLLECTION_HANDLE = {
   'Temel Beslenme': 'temel-beslenme',
   İçecekler: 'icecekler',
@@ -56,7 +54,7 @@ function getPerPage() {
  * LOADER
  * - URL’de ?category= varsa ilgili koleksiyonun ürünlerini getirir
  * - yoksa genel ürün akışından ürünleri getirir
- * Not: Basitlik adına ilk 48 ürünü alıyoruz; “Daha Fazla Göster” client-side slice ile çalışıyor.
+ * - “İçecekler” için olası Unicode handle varyasyonlarını dener, yine boşsa tag/product_type fallback araması yapar
  */
 export async function loader({request, context}) {
   const url = new URL(request.url);
@@ -68,20 +66,64 @@ export async function loader({request, context}) {
 
   const {storefront} = context;
 
-  if (handle) {
-    const data = await storefront.query(COLLECTION_PRODUCTS_QUERY, {
-      variables: {handle, first: 48},
-    });
+  // İçecekler için olası handle adayları (İ/ i / i̇ farkları)
+  const getHandleCandidates = (h) => {
+    if (!h) return [];
+    if (h === 'icecekler') {
+      return ['icecekler', 'içecekler', 'i̇cecekler'];
+    }
+    return [h];
+  };
 
-    const nodes = data?.collection?.products?.nodes ?? [];
-    // UI’nin beklediği forma yakın hafif normalize
+  if (handle) {
+    let data;
+    const tried = [];
+
+    // 1) Handle adaylarını sırayla dene
+    for (const h of getHandleCandidates(handle)) {
+      tried.push(h);
+      const res = await storefront.query(COLLECTION_PRODUCTS_QUERY, {
+        variables: {handle: h, first: 48},
+      });
+      if (res?.collection) {
+        data = res;
+        break;
+      }
+    }
+
+    let nodes = data?.collection?.products?.nodes ?? [];
+
+    // 2) Koleksiyon bulunamadıysa ya da boşsa -> ürün arama fallback'i
+    if (!data || nodes.length === 0) {
+      const searchQuery = [
+        'tag:"İçecekler"',
+        'tag:"icecekler"',
+        'product_type:"İçecekler"',
+        'product_type:"icecekler"',
+      ].join(' OR ');
+
+      const searchRes = await storefront.query(PRODUCTS_SEARCH_QUERY, {
+        variables: {first: 48, query: searchQuery},
+      });
+
+      nodes = searchRes?.products?.nodes ?? [];
+
+      if (nodes.length === 0) {
+        console.warn(
+          `[products._index] Collection fallback da boş. category="${category}", tried handles=[${tried.join(
+            ', ',
+          )}]`,
+        );
+      }
+    }
+
     const items = nodes.map((p) => ({
       id: p.id,
       handle: p.handle,
       name: p.title,
       img: p.featuredImage?.url ?? '',
-      hoverImg: null, // ileride 2. görseli eklersek doldururuz
-      badge: p.vendor || '', // istersen vendor’ı rozet gibi gösterebilirsin
+      hoverImg: null, // İleride 2. görseli eklemek istersen
+      badge: p.vendor || '',
       description: p.description || '',
     }));
 
@@ -364,7 +406,7 @@ function ProductCard({product}) {
               decoding="async"
             />
 
-            {/* Hover resmi ileride eklenecek */}
+            {/* Hover resmi (ileride eklenecekse kullanılır) */}
             {hovered && product.hoverImg && (
               <img
                 src={product.hoverImg}
@@ -445,6 +487,32 @@ const COLLECTION_PRODUCTS_QUERY = `#graphql
             width
             height
           }
+        }
+      }
+    }
+  }
+`;
+
+// Fallback: tag / product_type ile ürün arama
+const PRODUCTS_SEARCH_QUERY = `#graphql
+  query ProductsSearch(
+    $first: Int!
+    $query: String!
+    $country: CountryCode
+    $language: LanguageCode
+  ) @inContext(country: $country, language: $language) {
+    products(first: $first, query: $query) {
+      nodes {
+        id
+        handle
+        title
+        description
+        vendor
+        featuredImage {
+          url
+          altText
+          width
+          height
         }
       }
     }

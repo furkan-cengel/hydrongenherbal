@@ -1,7 +1,7 @@
 import {CartForm, Image} from '@shopify/hydrogen';
 import {useVariantUrl} from '~/lib/variants';
 import {Link} from 'react-router';
-import {ProductPrice} from './_shopify_base/ProductPrice';
+import {ProductPrice} from './ProductPrice';
 import {useAside} from './Aside';
 
 /**

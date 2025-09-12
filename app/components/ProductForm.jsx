@@ -1,6 +1,6 @@
 import {Link, useNavigate} from 'react-router';
 import {AddToCartButton} from './AddToCartButton';
-import {useAside} from '../Aside';
+import {useAside} from './Aside';
 
 /**
  * @param {{
@@ -8,20 +8,23 @@ import {useAside} from '../Aside';
  *   selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'];
  * }}
  */
-export function ProductForm({productOptions, selectedVariant}) {
+export function ProductForm({productOptions = [], selectedVariant}) {
   const navigate = useNavigate();
   const {open} = useAside();
   return (
     <div className="product-form">
-      {productOptions.map((option) => {
+      {(productOptions ?? []).map((option) => {
+        if (!option) return null;
         // If there is only a single value in the option values, don't display the option
-        if (option.optionValues.length === 1) return null;
+        if (!option.optionValues || option.optionValues.length === 1)
+          return null;
 
         return (
           <div className="product-options" key={option.name}>
             <h5>{option.name}</h5>
             <div className="product-options-grid">
-              {option.optionValues.map((value) => {
+              {(option.optionValues ?? []).map((value) => {
+                if (!value) return null;
                 const {
                   name,
                   handle,
@@ -96,6 +99,7 @@ export function ProductForm({productOptions, selectedVariant}) {
         );
       })}
       <AddToCartButton
+        route="/cart"
         disabled={!selectedVariant || !selectedVariant.availableForSale}
         onClick={() => {
           open('cart');
@@ -106,7 +110,6 @@ export function ProductForm({productOptions, selectedVariant}) {
                 {
                   merchandiseId: selectedVariant.id,
                   quantity: 1,
-                  selectedVariant,
                 },
               ]
             : []

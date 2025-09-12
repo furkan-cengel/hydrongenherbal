@@ -1,6 +1,6 @@
 import {useLoaderData} from 'react-router';
 import {CartForm} from '@shopify/hydrogen';
-import {data} from '@shopify/remix-oxygen';
+import {json} from '@shopify/remix-oxygen';
 import {CartMain} from '~/components/CartMain';
 
 /**
@@ -86,7 +86,7 @@ export async function action({request, context}) {
     headers.set('Location', redirectTo);
   }
 
-  return data(
+  return json(
     {
       cart: cartResult,
       errors,

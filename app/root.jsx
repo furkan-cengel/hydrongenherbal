@@ -1,4 +1,5 @@
 import {Analytics, getShopAnalytics, useNonce} from '@shopify/hydrogen';
+import {CartProvider} from '@shopify/hydrogen-react';
 import {
   Outlet,
   useRouteError,
@@ -16,6 +17,7 @@ import tailwindCss from './styles/tailwind.css?url';
 
 // Kendi layout'un
 import HmodeLayout from './components/HmodeLayout';
+import {Aside} from '~/components/Aside';
 
 /**
  * This is important to avoid re-fetching root queries on sub-navigations
@@ -152,10 +154,18 @@ export function Layout({children}) {
             shop={data.shop}
             consent={data.consent}
           >
-            <HmodeLayout>{children}</HmodeLayout>
+            <CartProvider cart={data.cart}>
+              <Aside.Provider>
+                <HmodeLayout>{children}</HmodeLayout>
+              </Aside.Provider>
+            </CartProvider>
           </Analytics.Provider>
         ) : (
-          <HmodeLayout>{children}</HmodeLayout>
+          <CartProvider cart={data.cart}>
+            <Aside.Provider>
+              <HmodeLayout>{children}</HmodeLayout>
+            </Aside.Provider>
+          </CartProvider>
         )}
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />

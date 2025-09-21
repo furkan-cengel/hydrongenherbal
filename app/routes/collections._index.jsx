@@ -3,7 +3,11 @@ import {useLoaderData, Link} from 'react-router';
 import {getPaginationVariables, Image} from '@shopify/hydrogen';
 // NOT: Şimdilik _shopify_base altındaki sürümü kullanıyoruz.
 // Bunu components köküne taşırsan import'u ~/components/PaginatedResourceSection yaparsın.
+<<<<<<< HEAD
 import {PaginatedResourceSection} from '~/components/_shopify_base/PaginatedResourceSection';
+=======
+import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
+>>>>>>> 5b99f58 (improvements)
 
 /** @type {import('react-router').MetaFunction} */
 export const meta = () => [

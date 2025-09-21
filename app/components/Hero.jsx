@@ -237,13 +237,24 @@ export default function Hero() {
 
       <section
         ref={sectionRef}
+<<<<<<< HEAD
         className="w-full min-h-screen pt-32 pb-16 lg:h-screen lg:pt-0 lg:pb-0 bg-gradient-to-r from-[#E4F2EA] to-white relative overflow-hidden"
+=======
+        className="w-full min-h-screen pt-16 sm:pt-20 md:pt-24 pb-16 lg:h-screen lg:pt-0 lg:pb-0 bg-gradient-to-r from-[#E4F2EA] to-white relative overflow-hidden"
+>>>>>>> 5b99f58 (improvements)
       >
         <img
           ref={gifRef}
           src="https://cdn.shopify.com/s/files/1/0761/4765/4889/files/hero.gif?v=1756624575"
           alt="Animated element"
+<<<<<<< HEAD
           className="w-32 sm:w-48 lg:w-72 h-auto absolute bottom-0 left-0 transform translate-y-full z-0"
+=======
+          className="pointer-events-none select-none
+                     w-26 sm:w-44 lg:w-72 h-auto
+                     absolute left-2 sm:left-4 bottom-8 sm:bottom-4
+                     z-[1] translate-y-[120%] lg:translate-y-full"
+>>>>>>> 5b99f58 (improvements)
         />
 
         <div className="w-full h-full flex flex-col lg:flex-row p-4">
@@ -258,7 +269,11 @@ export default function Hero() {
             order-2 lg:order-1 
             z-10
             /* Mobilde metin için ekstra üst boşluk */
+<<<<<<< HEAD
             mt-8 sm:mt-10 lg:mt-0
+=======
+            mt-2 sm:mt-3 md:mt-4 lg:mt-0 
+>>>>>>> 5b99f58 (improvements)
           "
           >
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-800 mb-2 leading-tight min-h-[120px] sm:min-h-[150px]">
@@ -282,6 +297,7 @@ export default function Hero() {
           {/* SAĞ: görsel fan - Mobilde daha aşağıda başlasın */}
           <div
             className="
+<<<<<<< HEAD
               w-full lg:w-3/5 
               relative flex items-center justify-center 
               order-1 lg:order-2
@@ -292,6 +308,15 @@ export default function Hero() {
               mt-4 sm:mt-6 md:mt-8 lg:mt-0
               /* Ekstra safe padding mobil için */
               pt-[calc(env(safe-area-inset-top)+1rem)] lg:pt-0
+=======
+                w-full lg:w-3/5
+              relative flex items-center justify-center
+              order-1 lg:order-2
+              z-[1]
+              h-[360px] sm:h-[420px] md:h-[480px] lg:h-full   /* biraz kısalttık */
+              -mt-1 sm:-mt-3 md:-mt-4 lg:mt-0                  /* grubu yukarı çektik */
+              pt-[calc(env(safe-area-inset-top)+.5rem)] lg:pt-0
+>>>>>>> 5b99f58 (improvements)
             "
           >
             {/* Görsel container - boyutları ayarla */}

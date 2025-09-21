@@ -3,7 +3,11 @@ import {redirect} from '@shopify/remix-oxygen';
 import {useLoaderData} from 'react-router';
 import {getPaginationVariables, Analytics} from '@shopify/hydrogen';
 // NOT: Şimdilik _shopify_base altındaki sürümleri kullanıyoruz.
+<<<<<<< HEAD
 import {PaginatedResourceSection} from '~/components/_shopify_base/PaginatedResourceSection';
+=======
+import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
+>>>>>>> 5b99f58 (improvements)
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {ProductItem} from '~/components/_shopify_base/ProductItem';
 

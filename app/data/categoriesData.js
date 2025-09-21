@@ -2,6 +2,10 @@ export const featuredProductsData = [
   {
     id: 1,
     name: 'Temel Beslenme',
+<<<<<<< HEAD
+=======
+    handle: 'temel-beslenme',
+>>>>>>> 5b99f58 (improvements)
     imgSrc:
       'https://cdn.shopify.com/s/files/1/0761/4765/4889/files/banana.webp?v=1756624831',
     bgColor: '#fff',
@@ -14,6 +18,10 @@ export const featuredProductsData = [
   {
     id: 2,
     name: 'İçecekler',
+<<<<<<< HEAD
+=======
+    handle: 'i̇cecekler',
+>>>>>>> 5b99f58 (improvements)
     imgSrc:
       'https://cdn.shopify.com/s/files/1/0761/4765/4889/files/ahududu_7b48c58d-5dd8-417a-a306-c37da5419a26.webp?v=1756624831',
     bgColor: '#fff',
@@ -25,6 +33,10 @@ export const featuredProductsData = [
   {
     id: 3,
     name: 'Atıştırmalıklar',
+<<<<<<< HEAD
+=======
+    handle: 'atistirmaliklar',
+>>>>>>> 5b99f58 (improvements)
     imgSrc:
       'https://cdn.shopify.com/s/files/1/0761/4765/4889/files/badem.webp?v=1756624831',
     bgColor: '#fff',
@@ -36,6 +48,10 @@ export const featuredProductsData = [
   {
     id: 4,
     name: 'Dış Beslenme',
+<<<<<<< HEAD
+=======
+    handle: 'dis-beslenme',
+>>>>>>> 5b99f58 (improvements)
     imgSrc:
       'https://cdn.shopify.com/s/files/1/0761/4765/4889/files/disbeslenme.webp?v=1756624831',
     bgColor: '#fff',
@@ -47,6 +63,10 @@ export const featuredProductsData = [
   {
     id: 5,
     name: 'Takviye Edici Gıdalar',
+<<<<<<< HEAD
+=======
+    handle: 'takviye-edici-gidalar',
+>>>>>>> 5b99f58 (improvements)
     imgSrc:
       'https://cdn.shopify.com/s/files/1/0761/4765/4889/files/takviye.webp?v=1756624830',
     bgColor: '#fff',
@@ -58,6 +78,10 @@ export const featuredProductsData = [
   {
     id: 6,
     name: 'Aktif Yaşam Ürünleri',
+<<<<<<< HEAD
+=======
+    handle: 'aktif-yasam-urunleri',
+>>>>>>> 5b99f58 (improvements)
     imgSrc:
       'https://cdn.shopify.com/s/files/1/0761/4765/4889/files/protein.webp?v=1756624831',
     bgColor: '#fff',

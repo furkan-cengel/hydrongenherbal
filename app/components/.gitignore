@@ -1,0 +1,20 @@
+# node
+node_modules/
+pnpm-lock.yaml
+package-lock.json
+.yarn/*
+.yarnrc.yml
+
+# build/artifacts
+dist/
+build/
+public/build/
+.server/
+.cache/
+.hydrogen/
+.remix/
+
+# env & misc
+.env
+.env.*.local
+.DS_Store

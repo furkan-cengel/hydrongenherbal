@@ -107,7 +107,11 @@ const Categories = forwardRef(function Categories(_, forwardedRef) {
   const buildCategoryHref = (name) =>
     name === 'Tüm Ürünler'
       ? '/products'
+<<<<<<< HEAD
       : `/products?category=${encodeURIComponent(name)}`;
+=======
+      : `/products?collection=${encodeURIComponent(name)}`;
+>>>>>>> 5b99f58 (improvements)
 
   return (
     <section
@@ -167,7 +171,11 @@ const Categories = forwardRef(function Categories(_, forwardedRef) {
 
                   {/* Ana Ürün Görseli - Link ile sarılmış */}
                   <Link
+<<<<<<< HEAD
                     to={buildCategoryHref(product.name)}
+=======
+                    to={buildCategoryHref(product.handle)}
+>>>>>>> 5b99f58 (improvements)
                     className="absolute inset-0 z-20 flex items-center justify-center -translate-y-16 lg:-translate-y-24"
                     aria-label={`${product.name} kategorisini görüntüle`}
                   >

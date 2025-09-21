@@ -69,9 +69,13 @@ html {
 /* app/styles/app.css (veya tailwind.css içinde) */
 
 /* Tailwind’in yüklenmesi */
+<<<<<<< HEAD
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+=======
+
+>>>>>>> 5b99f58 (improvements)
 
 /* Oswald font dosyaları */
 @font-face {
@@ -126,3 +130,9 @@ html {
 .swiper-button-prev::after {
   display: none !important;
 }
+<<<<<<< HEAD
+=======
+/* ===== Aside (cart/search/mobile) overlay ===== */
+
+
+>>>>>>> 5b99f58 (improvements)
